@@ -1,9 +1,9 @@
 package com.okaphone.yajp;
 
 import com.okaphone.yajp.Extras.ArrayBuilder;
+import com.okaphone.yajp.Extras.ObjectBuilder;
 import com.okaphone.yajp.Json.Value;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import junit.framework.TestCase;
 
 public class Tests
@@ -72,11 +72,11 @@ public class Tests
       assertFalse(Json.parse("[]").isNull());
       assertTrue(Json.parse("[]").isEmpty());
       assertEquals(0,Json.parse("[]").array().length);
-      Value[] test=Json.parse("[1,[2,[4,\"5\",[6]]],3]").array();
+      final Value[] test=Json.parse("[1,[2,[{\"aap\":4},\"5\",[6,7]]],3]").array();
       assertEquals(1.0,test[0].number(),0.0);
       assertEquals(2.0,test[1].get(0).number(),0.0);
-      assertEquals(3.0,test[2].number(),0.0);
-      assertEquals(4.0,test[1].get(1,0).number(),0.0);
+      assertEquals(3,test[2].integer(),0.0);
+      assertEquals(4.0,test[1].get(1,0).get("aap").number(),0.0);
       assertEquals("5",test[1].get(1,1).string());
       assertEquals(6.0,test[1].get(1,2,0).number(),0.0);
    }
@@ -84,19 +84,59 @@ public class Tests
    public void testObjectParser() {
       assertFalse(Json.parse("{}").isNull());
       assertTrue(Json.parse("{}").isEmpty());
-      assertEquals(new HashMap<String,Value>(),Json.parse("{}").object());
-      Value test=Json.parse("{\"aap\":1,\"noot\":{\"wim\":2,\"gijs\":{\"does\":\"4\"}},\"mies\":3}");
+      assertEquals(0,Json.parse("{}").object().size());
+      final Value test=Json.parse("{\"aap\":1,\"noot\":{\"wim\":2,\"gijs\":{\"does\":[4,6],\"hok\":\"5\"}},\"mies\":3}");
       assertEquals(1.0,test.get("aap").number(),0.0);
       assertEquals(2.0,test.get("noot","wim").number(),0.0);
       assertEquals(3.0,test.get("mies").number(),0.0);
-      assertEquals("4",test.get("noot","gijs","does").string());
+      assertEquals(4,test.get("noot","gijs","does").array()[0].integer());
+      assertEquals("5",test.get("noot","gijs","hok").string());
+      assertEquals(6.0,test.get("noot","gijs","does").get(1).number());
    }
 
    public void testArrayBuilder() {
       assertEquals("[]",new ArrayBuilder().build());
-      assertEquals("[]",new ArrayBuilder(new ArrayList<String>()).build());
+      assertEquals("[]",new ArrayBuilder(Collections.emptyList()).build());
       assertEquals("[1,2,3]",new ArrayBuilder(1,2,3).build());
       assertEquals("[\"1\",\"2\",\"3\"]",new ArrayBuilder("1","2","3").build());
-      assertEquals("[1,[2,null],\"3\",true]",new ArrayBuilder(1,new ArrayBuilder(2,null),"3",true).build());
+      final ObjectBuilder object=new ObjectBuilder();
+      object.put("aap",2);
+      assertEquals("[1,[{\"aap\":2},null],\"3\",true]",new ArrayBuilder(1,new ArrayBuilder(object,null),"3",true).build());
+   }
+
+   public void testObjectBuilder() {
+      assertEquals("{}",new ObjectBuilder().build());
+      assertEquals("{}",new ObjectBuilder(Collections.emptyMap()).build());
+      final ObjectBuilder array=new ObjectBuilder();
+      array.put("aap",1);
+      array.put("noot",2);
+      array.put("mies",3);
+      final String json=array.build();
+      assertTrue(json.contains("\"aap\":1"));
+      assertTrue(json.contains("\"noot\":2"));
+      assertTrue(json.contains("\"mies\":3"));
+      array.clear();
+      array.put("aap","1");
+      array.put("noot","2");
+      array.put("mies","3");
+      final String json2=array.build();
+      assertTrue(json2.contains("\"aap\":\"1\""));
+      assertTrue(json2.contains("\"noot\":\"2\""));
+      assertTrue(json2.contains("\"mies\":\"3\""));
+      array.clear();
+      array.put("aap",1);
+      final ObjectBuilder array2=new ObjectBuilder();
+      array2.put("wim",new ArrayBuilder(2));
+      array2.put("zus",null);
+      array.put("noot",array2);
+      array.put("gijs","3");
+      array.put("mies",true);
+      final String json3=array.build();
+      assertTrue(json3.contains("\"aap\":1"));
+      assertTrue(json3.contains("\"noot\":{"));
+      assertTrue(json3.contains("\"wim\":[2]"));
+      assertTrue(json3.contains("\"zus\":null"));
+      assertTrue(json3.contains("\"gijs\":\"3\""));
+      assertTrue(json3.contains("\"mies\":true"));
    }
 }
