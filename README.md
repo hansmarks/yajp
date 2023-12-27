@@ -1,5 +1,5 @@
 # yajp
-Yet another JSON parser (small, fast ,correct and no dependencies)
+Yet another JSON parser (small, fast, correct and no dependencies)
 
 © 2023 by J.R. Marks is licensed under CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
