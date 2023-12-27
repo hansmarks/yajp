@@ -7,4 +7,6 @@ I wanted a JSON parser without all kinds of bloat that simply and efficiently pa
 
 Couldn't find it, so I decided to write my own. And guess what? It wasn't actually very difficult. As a bonus it also has handy methods to write JSON messages (anonymous object or array).
 
+(Examples of usage may be found in the Tests.java file.)
+
 CU Hans
