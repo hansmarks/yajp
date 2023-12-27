@@ -72,20 +72,24 @@ public class Tests
       assertFalse(Json.parse("[]").isNull());
       assertTrue(Json.parse("[]").isEmpty());
       assertEquals(0,Json.parse("[]").array().length);
-      Value[] test=Json.parse("[1,[2],3]").array();
+      Value[] test=Json.parse("[1,[2,[4,\"5\",[6]]],3]").array();
       assertEquals(1.0,test[0].number(),0.0);
       assertEquals(2.0,test[1].get(0).number(),0.0);
       assertEquals(3.0,test[2].number(),0.0);
+      assertEquals(4.0,test[1].get(1,0).number(),0.0);
+      assertEquals("5",test[1].get(1,1).string());
+      assertEquals(6.0,test[1].get(1,2,0).number(),0.0);
    }
 
    public void testObjectParser() {
       assertFalse(Json.parse("{}").isNull());
       assertTrue(Json.parse("{}").isEmpty());
       assertEquals(new HashMap<String,Value>(),Json.parse("{}").object());
-      Value test=Json.parse("{\"aap\":1,\"noot\":{\"wim\":2},\"mies\":3}");
+      Value test=Json.parse("{\"aap\":1,\"noot\":{\"wim\":2,\"gijs\":{\"does\":\"4\"}},\"mies\":3}");
       assertEquals(1.0,test.get("aap").number(),0.0);
       assertEquals(2.0,test.get("noot","wim").number(),0.0);
       assertEquals(3.0,test.get("mies").number(),0.0);
+      assertEquals("4",test.get("noot","gijs","does").string());
    }
 
    public void testArrayBuilder() {
@@ -93,5 +97,6 @@ public class Tests
       assertEquals("[]",new ArrayBuilder(new ArrayList<String>()).build());
       assertEquals("[1,2,3]",new ArrayBuilder(1,2,3).build());
       assertEquals("[\"1\",\"2\",\"3\"]",new ArrayBuilder("1","2","3").build());
+      assertEquals("[1,[2,null],\"3\",true]",new ArrayBuilder(1,new ArrayBuilder(2,null),"3",true).build());
    }
 }
