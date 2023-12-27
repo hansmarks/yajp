@@ -12,10 +12,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Json { // ECMA-404
+/**
+ * The parser.
+ * And some convenience methods for null safe usage.
+ *
+ * Utility class, no need to create an instance.
+ *
+ * © Copyright J.R. Marks 2023
+ */
+public class Json {
    private static final Pattern NUMERIC=Pattern.compile("-?\\d.*");
    private static final Pattern NUMBER=Pattern.compile("([-\\d.eE+]+).*");
    private static final Pattern ENCODED=Pattern.compile("\\\\([\\\\\"/bfnrt]|(u[\\da-fA-F]{4}))");
@@ -24,7 +31,9 @@ public class Json { // ECMA-404
    private Json() {
    }
 
-   // The parser
+   /**
+    * The possible data types in JSON.
+    */
    public static enum Type {
       NULL,
       BOOLEAN,
@@ -34,6 +43,13 @@ public class Json { // ECMA-404
       OBJECT
    }
 
+   /**
+    * The output of the parser.
+    * Any primitive or composite value that is possible in JSON can be represented bij an instance of this class.
+    * It is a true value class, so instances are immutable and have identity based on their embedded value.
+    *
+    * @throws UnsupportedOperationException when used in ways that the type of the value does not support.
+    */
    public static final class Value {
       private static final Value NULL=new Value(Type.NULL,null);
       private static final Value TRUE=new Value(Type.BOOLEAN,true);
@@ -259,7 +275,7 @@ public class Json { // ECMA-404
       }
 
       private RuntimeException error() {
-         return new IllegalStateException("wrong type: "+type);
+         return new UnsupportedOperationException("wrong type: "+type);
       }
    }
 
@@ -420,18 +436,25 @@ public class Json { // ECMA-404
    }
 
    private static RuntimeException syntax(final String json) {
-      return new IllegalStateException("syntax error: "+json);
+      return new IllegalArgumentException("syntax error: "+json);
    }
 
-   public static Value parse(final String json) {
-      final Parsed parsed=value(json);
+   /**
+    * Parses a valid ECMA-404 JSON string.
+    *
+    * @param message a JSON string (normally an anonymous object or array, but a primitive value also works)
+    * @return a {@link Value} object that represents the parsed string
+    *
+    * @throws IllegalArgumentException on syntax errors
+    */
+   public static Value parse(final String message) {
+      final Parsed parsed=value(message);
       if(!parsed.tail().isEmpty()) {
          throw syntax(parsed.tail());
       }
       return parsed.value();
    }
 
-   // Convenience methods
    public static <TYPE> TYPE value0(final Value value,final Function<Value,TYPE> map) {
       return value==null||value.isNull()?null:map.apply(value);
    }
@@ -470,74 +493,5 @@ public class Json { // ECMA-404
 
    public static Optional<String> string(final Value value) {
       return Optional.ofNullable(string0(value));
-   }
-
-   // extra's for JSON construction
-   private static String encode(final String raw) {
-      return replace(raw,(c)->{
-                  switch(c) {
-                     case '\\':
-                        return "\\\\";
-                     case '"':
-                        return "\\\"";
-                     case '\b':
-                        return "\\b";
-                     case '\f':
-                        return "\\f";
-                     case '\n':
-                        return "\\n";
-                     case '\r':
-                        return "\\r";
-                     case '\t':
-                        return "\\t";
-                     default:
-                        if(c<' ') {
-                           final String hex="000"+Integer.toHexString(c);
-                           return "\\u"+hex.substring(hex.length()-4);
-                        }
-                        return null;
-                  }
-               });
-   }
-
-   private static String quote(final String value) {
-      return value.isEmpty()?"\"\"":'"'+encode(value)+'"';
-   }
-
-   private static String value(final Object value) {
-      if(value==null) {
-         return "null";
-      }
-      if(value instanceof List) {
-         return array((List)value);
-      }
-      if(value instanceof Builder) {
-         return object((Builder)value);
-      }
-      if(value instanceof Boolean||value instanceof Integer||value instanceof Long||value instanceof Float||value instanceof Double) {
-         return value.toString();
-      }
-      return quote(value.toString());
-   }
-
-   private static String array(final List<?> values) {
-      return values.isEmpty()?"[]":values.stream().map(Json::value).collect(Collectors.joining(",","[","]"));
-   }
-
-   private static String member(final Map.Entry<String,?> member) {
-      return quote(member.getKey())+':'+value(member.getValue());
-   }
-
-   /** (use the Builder for objects and Lists for arrays)
-    *
-    * @param members
-    * @return
-    */
-   public static String object(final Builder members) {
-      return members.isEmpty()?"{}":members.entrySet().stream().map(Json::member).collect(Collectors.joining(",","{","}"));
-   }
-
-   public static final class Builder
-         extends HashMap<String,Object> {
    }
 }

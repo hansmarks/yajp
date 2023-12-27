@@ -4,6 +4,13 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A few handy string functions.
+ *
+ * Utility class, no need to create an instance.
+ *
+ * © Copyright J.R. Marks 2023
+ */
 public class Utils {
    private Utils() {
    }
