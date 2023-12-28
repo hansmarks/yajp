@@ -26,7 +26,8 @@ public class Json {
    private static final Pattern NUMERIC=Pattern.compile("-?\\d.*");
    private static final Pattern NUMBER=Pattern.compile("([-\\d.eE+]+).*");
    private static final Pattern ENCODED=Pattern.compile("\\\\([\\\\\"/bfnrt]|(u[\\da-fA-F]{4}))");
-   private static final Pattern TAIL=Pattern.compile("\\s*([,}\\]].*)?");
+   private static final Pattern TAIL=Pattern.compile("[\\x20\\r\\n\\t]*([,}\\]].*)?");
+   private static final String WHITESPACE=" \r\n\t";
 
    private Json() {
    }
@@ -425,7 +426,7 @@ public class Json {
 
    private static boolean lookahead(final String tail,final char next) {
       int i=0;
-      while(i<tail.length()&&Character.isWhitespace(tail.charAt(i))) { // strictly whitespace are only SPC, HT, LF and CR
+      while(i<tail.length()&&0<=WHITESPACE.indexOf(tail.charAt(i))) {
          i++;
       }
       return i<tail.length()&&tail.charAt(i)==next;
