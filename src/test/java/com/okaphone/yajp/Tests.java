@@ -2,7 +2,6 @@ package com.okaphone.yajp;
 
 import com.okaphone.yajp.Extras.ArrayBuilder;
 import com.okaphone.yajp.Extras.ObjectBuilder;
-import com.okaphone.yajp.Json.Value;
 import java.util.Collections;
 import junit.framework.TestCase;
 
@@ -72,7 +71,7 @@ public class Tests
       assertFalse(Json.parse("[]").isNull());
       assertTrue(Json.parse("[]").isEmpty());
       assertEquals(0,Json.parse("[]").array().length);
-      final Value[] test=Json.parse("[1,[2,[{\"aap\":4},\"5\",[6,7]]],3]").array();
+      final Value<?>[] test=Json.parse("[1,[2,[{\"aap\":4},\"5\",[6,7]]],3]").array();
       assertEquals(1.0,test[0].number(),0.0);
       assertEquals(2.0,test[1].get(0).number(),0.0);
       assertEquals(3,test[2].integer(),0.0);
@@ -85,7 +84,7 @@ public class Tests
       assertFalse(Json.parse("{}").isNull());
       assertTrue(Json.parse("{}").isEmpty());
       assertEquals(0,Json.parse("{}").object().size());
-      final Value test=Json.parse("{\"aap\":1,\"noot\":{\"wim\":2,\"gijs\":{\"does\":[4,6],\"hok\":\"5\"}},\"mies\":3}");
+      final Value<?> test=Json.parse("{\"aap\":1,\"noot\":{\"wim\":2,\"gijs\":{\"does\":[4,6],\"hok\":\"5\"}},\"mies\":3}");
       assertEquals(1.0,test.get("aap").number(),0.0);
       assertEquals(2.0,test.get("noot","wim").number(),0.0);
       assertEquals(3.0,test.get("mies").number(),0.0);
