@@ -425,7 +425,7 @@ public class Json {
 
    private static boolean lookahead(final String tail,final char next) {
       int i=0;
-      while(i<tail.length()&&Character.isWhitespace(tail.charAt(i))) {
+      while(i<tail.length()&&Character.isWhitespace(tail.charAt(i))) { // strictly whitespace are only SPC, HT, LF and CR
          i++;
       }
       return i<tail.length()&&tail.charAt(i)==next;
