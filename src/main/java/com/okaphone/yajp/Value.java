@@ -16,6 +16,8 @@ import java.util.stream.Stream;
  * It is a true value class, so all instances are immutable and have identity based on their embedded value.
  *
  * @throws UnsupportedOperationException when used in ways that the type (i.e. subclass) of the value does not support.
+ *
+ * © Copyright J.R. Marks 2023
  */
 public abstract class Value<TYPE> {
    private static final NullValue NULL=new NullValue();
