@@ -38,6 +38,7 @@ public class Tests
       assertFalse(Json.parse("0").isNull());
       assertTrue(Json.parse("0").isZero());
       assertEquals(0.0,Json.parse("0").value());
+      assertFalse(Json.parse("1").isZero());
       assertEquals(1.0,Json.parse("1").number(),0.0);
       assertEquals(1.0,Json.parse("1.0").number(),0.0);
       assertEquals(1.23,Json.parse("1.23").number(),0.0);
