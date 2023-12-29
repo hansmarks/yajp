@@ -125,7 +125,7 @@ public abstract class Value<TYPE> {
       throw error();
    }
 
-   public final TYPE value() {
+   protected final TYPE value() {
       return value;
    }
 
