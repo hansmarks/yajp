@@ -57,10 +57,6 @@ public abstract class Value<TYPE> {
       return value.isEmpty()?OBJECT:new ObjectValue(value);
    }
 
-   protected final TYPE value() {
-      return value;
-   }
-
    public boolean isNull() {
       return false;
    }
@@ -127,6 +123,10 @@ public abstract class Value<TYPE> {
 
    public Value<?> get(final String... key) {
       throw error();
+   }
+
+   public final TYPE value() {
+      return value;
    }
 
    @Override
@@ -250,8 +250,8 @@ public abstract class Value<TYPE> {
 
       @Override
       public final Value<?> get(final int... i) {
-         final Value<?> item=get(i[0]);
-         return i.length==1?item:item.get(Arrays.copyOfRange(i,1,i.length));
+         final Value<?> value=get(i[0]);
+         return i.length==1?value:value.get(Arrays.copyOfRange(i,1,i.length));
       }
 
       @Override
@@ -297,8 +297,8 @@ public abstract class Value<TYPE> {
 
       @Override
       public Value<?> get(final String... key) {
-         final Value<?> member=get(key[0]);
-         return key.length==1?member:member==null?null:member.get(Arrays.copyOfRange(key,1,key.length));
+         final Value<?> value=get(key[0]);
+         return key.length==1?value:value==null?null:value.get(Arrays.copyOfRange(key,1,key.length));
       }
    }
 }

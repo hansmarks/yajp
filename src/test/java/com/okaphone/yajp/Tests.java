@@ -3,6 +3,7 @@ package com.okaphone.yajp;
 import com.okaphone.yajp.Extras.ArrayBuilder;
 import com.okaphone.yajp.Extras.ObjectBuilder;
 import java.util.Collections;
+import java.util.stream.Stream;
 import junit.framework.TestCase;
 
 public class Tests
@@ -12,7 +13,6 @@ public class Tests
 
    public void testNullParser() {
       assertTrue(Json.parse("null").isNull());
-      assertNull(Json.parse("null").value());
       assertNull(Json.parse("null").value());
       assertNull(Json.parse(" null").value());
       assertNull(Json.parse("null ").value());
@@ -27,7 +27,7 @@ public class Tests
       assertTrue(Json.parse("true ").bool());
       assertTrue(Json.parse(" true ").bool());
       assertFalse(Json.parse("false").isNull());
-      assertFalse(Json.parse("false").bool());
+      assertEquals(Boolean.FALSE,Json.parse("false").value());
       assertFalse(Json.parse("false").bool());
       assertFalse(Json.parse(" false").bool());
       assertFalse(Json.parse("false ").bool());
@@ -35,9 +35,11 @@ public class Tests
    }
 
    public void testNumberParser() {
-      assertFalse(Json.parse("1").isNull());
+      assertFalse(Json.parse("0").isNull());
+      assertTrue(Json.parse("0").isZero());
+      assertEquals(0.0,Json.parse("0").value());
       assertEquals(1.0,Json.parse("1").number(),0.0);
-      assertEquals(1.0,Json.parse("1").number(),0.0);
+      assertEquals(1.0,Json.parse("1.0").number(),0.0);
       assertEquals(1.23,Json.parse("1.23").number(),0.0);
       assertEquals(1.23,Json.parse(" 1.23").number(),0.0);
       assertEquals(1.23,Json.parse("1.23 ").number(),0.0);
@@ -48,6 +50,7 @@ public class Tests
    public void testStringParser() {
       assertFalse(Json.parse("\"\"").isNull());
       assertTrue(Json.parse("\"\"").isEmpty());
+      assertEquals("",Json.parse("\"\"").value());
       assertEquals("",Json.parse("\"\"").string());
       assertFalse(Json.parse("\"aap\"").isEmpty());
       assertEquals("aap",Json.parse("\"aap\"").string());
@@ -96,6 +99,7 @@ public class Tests
    public void testArrayBuilder() {
       assertEquals("[]",new ArrayBuilder().build());
       assertEquals("[]",new ArrayBuilder(Collections.emptyList()).build());
+      assertEquals("[]",new ArrayBuilder(Stream.empty()).build());
       assertEquals("[1,2,3]",new ArrayBuilder(1,2,3).build());
       assertEquals("[\"1\",\"2\",\"3\"]",new ArrayBuilder("1","2","3").build());
       final ObjectBuilder object=new ObjectBuilder();
